@@ -25,6 +25,12 @@ export default function AIInterviewHelper() {
     const [techQuestions, setTechQuestions] = useState([]);
     const [loadingTech, setLoadingTech] = useState(false);
 
+
+    // Job Role & Skills Helper states
+    const [jobRole, setJobRole] = useState("");
+    const [jobInsights, setJobInsights] = useState(null);
+    const [loadingJobInsights, setLoadingJobInsights] = useState(false);
+
     // Fetch Industry Q&A
     const fetchQA = async () => {
         if (!industry.trim()) return toast.error("Please enter an industry!");
@@ -81,6 +87,41 @@ export default function AIInterviewHelper() {
     };
 
 
+    // Fetch Job Role & Skills Insights
+    const fetchJobInsights = async () => {
+        if (!industry || !jobRole) {
+            return toast.error("Please enter both Industry and Job Role!");
+        }
+
+        setLoadingJobInsights(true);
+        try {
+            const prompt = `
+                Provide key skills, salary trends, and career growth insights for a ${jobRole} in the ${industry} industry.
+                Format the response as JSON with keys: "skills", "salary", "career_growth".
+            `;
+
+            const result = await chatSession.sendMessage(prompt);
+            let responseText = result.response.text().trim();
+
+            // Extract JSON response using regex
+            const jsonMatch = responseText.match(/\{.*\}/s);
+            if (!jsonMatch) {
+                throw new Error("Invalid AI response format.");
+            }
+
+            console.log(jsonMatch, "ffs");
+
+
+            setJobInsights(JSON.parse(jsonMatch[0]));
+        } catch (error) {
+            console.error("Gemini AI Error:", error);
+            toast.error("Failed to fetch job insights.");
+        } finally {
+            setLoadingJobInsights(false);
+        }
+    };
+
+
     return (
         <div className="container  px-6 pt-28">
             <Link className="pb-8" href={'/dashboard'}>
@@ -96,6 +137,7 @@ export default function AIInterviewHelper() {
                 <TabsList className="flex justify-center gap-4 p-8 mb-6">
                     <TabsTrigger value="industry" className="px-4 py-2">Industry Q&A</TabsTrigger>
                     <TabsTrigger value="tech" className="px-4 py-2">Technical Questions</TabsTrigger>
+                    <TabsTrigger value="job" className="px-4 py-2">Job Role & Skills</TabsTrigger>
                 </TabsList>
 
                 {/* Industry Q&A Tab */}
@@ -220,6 +262,136 @@ export default function AIInterviewHelper() {
                                 </div>
                             </div>
                         )}
+                    </div>
+                </TabsContent>
+
+
+                {/* Job Role & Skills Helper Tab */}
+                <TabsContent value="job">
+                    <div className="max-w-xl ">
+                        <h2 className="text-xl font-semibold mb-4">Job Role & Skills Helper</h2>
+
+                        <Input
+                            type="text"
+                            placeholder="Enter Industry (e.g., IT, Healthcare)"
+                            value={industry}
+                            onChange={(e) => setIndustry(e.target.value)}
+                            className="mb-3"
+                        />
+
+                        <Input
+                            type="text"
+                            placeholder="Enter Job Role (e.g., Software Engineer, Data Analyst)"
+                            value={jobRole}
+                            onChange={(e) => setJobRole(e.target.value)}
+                            className="mb-3"
+                        />
+
+                        <Button onClick={fetchJobInsights} className="w-full" disabled={loadingJobInsights}>
+                            {loadingJobInsights ? "Generating..." : "Get Insights"}
+                        </Button>
+
+                        {/* Display Job Role & Skills Insights */}
+                        {/* {jobInsights && (
+                            <div className="mt-6">
+                                <h3 className="text-xl font-semibold mb-3">Insights for {jobRole}</h3>
+
+                                <Card className="mb-4">
+                                    <CardContent className="p-4">
+                                        <h4 className="font-semibold text-blue-600">Key Skills</h4>
+                                        <p className="mt-2 text-gray-700">{jobInsights?.skills}</p>
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="mb-4">
+                                    <CardContent className="p-4">
+                                        <h4 className="font-semibold text-blue-600">Salary Trends</h4>
+                                        <p className="mt-2 text-gray-700">{jobInsights?.salary}</p>
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="mb-4">
+                                    <CardContent className="p-4">
+                                        <h4 className="font-semibold text-blue-600">Career Growth Insights</h4>
+                                        <p className="mt-2 text-gray-700">{jobInsights?.career_growth}</p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )} */}
+
+                        {jobInsights && (
+                            <div className="mt-6">
+                                <h3 className="text-xl font-semibold mb-3">Insights for {jobRole}</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-5 w-96">
+                                    {/* Key Skills */}
+                                    <Card className="mb-4 w-36">
+                                        <CardContent className="p-4">
+                                            <h4 className="font-semibold text-blue-600">Key Skills</h4>
+                                            {jobInsights.skills && (
+                                                <div className="mt-2 text-gray-700">
+                                                    {Object.entries(jobInsights.skills).map(([category, skills]) => (
+                                                        <div key={category} className="mb-3">
+                                                            <h5 className="font-medium text-gray-800 capitalize">{category.replace("_", " ")}:</h5>
+                                                            <ul className="list-disc list-inside ml-4">
+                                                                {skills.map((skill, index) => (
+                                                                    <li key={index}>{skill}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+
+                                    {/* Salary Trends */}
+                                    <Card className="mb-4 w-36">
+                                        <CardContent className="p-4">
+                                            <h4 className="font-semibold text-blue-600">Salary Trends</h4>
+                                            {jobInsights.salary && (
+                                                <div className="mt-2 text-gray-700">
+                                                    {Object.entries(jobInsights.salary).map(([level, info]) => (
+                                                        <div key={level} className="mb-3">
+                                                            <h5 className="font-medium text-gray-800 capitalize">{level.replace("_", " ")}:</h5>
+                                                            {typeof info === "object" ? (
+                                                                <div className="ml-4">
+                                                                    <p><strong>Range:</strong> {info.range}</p>
+                                                                    <p className="text-sm text-gray-600">{info.notes}</p>
+                                                                </div>
+                                                            ) : (
+                                                                <p>{info}</p>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+
+                                    {/* Career Growth */}
+                                    <Card className="mb-4 w-36">
+                                        <CardContent className="p-4">
+                                            <h4 className="font-semibold text-blue-600">Career Growth Insights</h4>
+                                            {jobInsights.career_growth && (
+                                                <div className="mt-2 text-gray-700">
+                                                    {Object.entries(jobInsights.career_growth).map(([category, details]) => (
+                                                        <div key={category} className="mb-3">
+                                                            <h5 className="font-medium text-gray-800 capitalize">{category.replace("_", " ")}:</h5>
+                                                            <ul className="list-disc list-inside ml-4">
+                                                                {details.map((item, index) => (
+                                                                    <li key={index}>{item}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </div>
+                        )}
+
                     </div>
                 </TabsContent>
             </Tabs>
