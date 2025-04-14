@@ -90,7 +90,7 @@ export default function ResumeBuilder({ initialContent }) {
 
     const contactSchema = z.object({
         email: z.string().email("Invalid email address"),
-        mobile: z.string().optional(),
+        mobile: z.number().min(1).max(10),
         linkedin: z.string().optional(),
         twitter: z.string().optional(),
     });
