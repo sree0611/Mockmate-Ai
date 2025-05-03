@@ -27,6 +27,7 @@ const Dashboard = () => {
                 </div>
                 <div className="flex gap-3">
                     {/* Resume Builder Button - Black */}
+
                     <Button onClick={handleClick} className="bg-black text-white hover:bg-gray-800">
                         <FileText className="w-6 h-6 mr-2" /> Resume Builder
                     </Button>

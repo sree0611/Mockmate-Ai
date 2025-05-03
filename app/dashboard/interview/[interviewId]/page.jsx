@@ -26,12 +26,10 @@ const Interview = () => {
       .select()
       .from(MockInterview)
       .where(eq(MockInterview.mockId, params.interviewId));
-    console.log(result, "result");
 
     setInterviewData(result[0]);
   };
 
-  console.log(interviewData);
 
   return (
     <div className="pt-36 container px-12">

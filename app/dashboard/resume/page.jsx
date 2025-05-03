@@ -32,19 +32,9 @@ const ResumePage = () => {
             .select()
             .from(Resume)
             .where(eq(Resume.userEmail, user?.primaryEmailAddress?.emailAddress));
-        console.log(result, "result");
         setResume(result)
 
     }
-
-
-
-    console.log(resume, "resume");
-
-    // console.log(resume[0]?.content, "hhfhf");
-
-
-
 
     return (
         <div className="container mx-auto py-6  px-8">

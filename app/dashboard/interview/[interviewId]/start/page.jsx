@@ -35,6 +35,7 @@ const StartInterview = () => {
             }
 
             const interview = result[0]
+
             setInterviewData(interview)
 
             // Parse JSON safely
@@ -66,15 +67,15 @@ const StartInterview = () => {
         <div className='pt-28'>
             {loading ? (
                 <div className="flex flex-col items-center justify-center h-[40vh] bg-gray-100 space-y-3">
-                <div className="flex space-x-2">
-                  <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce"></div>
-                  <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce delay-150"></div>
-                  <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce delay-300"></div>
+                    <div className="flex space-x-2">
+                        <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce"></div>
+                        <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce delay-150"></div>
+                        <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce delay-300"></div>
+                    </div>
+                    <p className="text-gray-600 text-base font-normal">
+                        Loading interviews, please wait...
+                    </p>
                 </div>
-                <p className="text-gray-600 text-base font-normal">
-                  Loading interviews, please wait...
-                </p>
-              </div>
             ) : (
                 <>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-10'>

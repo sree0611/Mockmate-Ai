@@ -1,142 +1,3 @@
-// "use client"
-// import { Button } from '@/components/ui/button'
-// import Image from 'next/image'
-// import React, { useEffect, useState } from 'react'
-// import Webcam from 'react-webcam'
-// import useSpeechToText from 'react-hook-speech-to-text';
-// import { Mic } from 'lucide-react'
-// import { toast } from 'sonner'
-// import { chatSession } from '@/utils/GeminiAImodal'
-// import { db } from '@/utils/db'
-// import { UserAnswer } from '@/utils/schema'
-// import { useUser } from '@clerk/nextjs'
-// import moment from 'moment'
-
-// const RecordAnswerSection = ({ mockInterviewQuestion, activeQuestionIndex, interviewData }) => {
-
-//     const { user } = useUser()
-
-//     const [userAnswer, setUserAnswer] = useState('')
-//     const [loading, setLoading] = useState(false)
-
-//     const {
-//         error,
-//         interimResult,
-//         isRecording,
-//         results,
-//         startSpeechToText,
-//         stopSpeechToText,
-//         setResults
-//     } = useSpeechToText({
-//         continuous: true,
-//         useLegacyResults: false
-
-//     });
-
-//     useEffect(() => {
-//         results.map((result) => {
-//             setUserAnswer(prevAns => prevAns + result?.transcript)
-//         })
-//     }, [results])
-
-
-//     useEffect(() => {
-//         if (isRecording && userAnswer?.length > 1) {
-//             updateUserAnswer();
-//         }
-
-//     }, [userAnswer])
-
-//     console.log(userAnswer, "user answer");
-
-
-//     const StartStopRecording = async () => {
-//         if (isRecording) {
-//             stopSpeechToText()
-//             if (userAnswer?.length < 1) {
-//                 setLoading(false)
-//                 toast('Error while saving your answer, please record again')
-//                 return;
-//             }
-//         } else {
-//             startSpeechToText()
-//         }
-//     }
-
-
-//     const updateUserAnswer = async () => {
-//         setLoading(true)
-//         const feedbackPrompt = `Question:${mockInterviewQuestion && mockInterviewQuestion[activeQuestionIndex]?.question}, User Answer:${userAnswer}, Depends in question and user answer for given interview question please give us rating for answer and feedback as area of improvement if any in just 3 to 5 lines to improve it in JSON format with rating field and feedback field  `
-
-//         const result = await chatSession.sendMessage(feedbackPrompt)
-
-//         const MockResponse = result.response
-//             .text()
-//             .replace('```json', '')
-//             .replace('```', '');
-
-//         console.log(MockResponse, "mockreposnse");
-
-//         const JsonFeedbackResp = JSON.parse(MockResponse)
-
-//         const resp = await db.insert(UserAnswer)
-//             .values({
-//                 mockIdRef: interviewData?.mockId,
-//                 question: mockInterviewQuestion && mockInterviewQuestion[activeQuestionIndex]?.question,
-//                 correctAns: mockInterviewQuestion && mockInterviewQuestion[activeQuestionIndex]?.answer,
-//                 userAns: userAnswer,
-//                 feedback: JsonFeedbackResp?.feedback,
-//                 rating: JsonFeedbackResp?.rating,
-//                 userEmail: user?.primaryEmailAddress?.emailAddress,
-//                 createdAt: moment().format('DD-MM-yyyy')
-//             })
-//         if (resp) {
-//             toast('User Answer recorded successfully ')
-//             setUserAnswer('')
-//             setResults([])
-//         }
-//         setUserAnswer([])
-//         setLoading(false)
-//     }
-
-
-
-
-
-
-//     return (
-//         <div className='flex flex-col justify-center items-center mt-20'>
-//             <div className='flex flex-col justify-center items-center   rounded-md  '>
-//                 <Image src={'/web-cam3.avif'} alt='webcam' width={300} height={300}
-//                     className='absolute'
-//                 />
-//                 <Webcam
-//                     mirrored={false}
-//                     style={{
-//                         height: 300,
-//                         width: "100%",
-//                         zIndex: 10
-//                     }}
-//                 />
-//             </div>
-//             <Button variant="outline" className="my-10"
-//                 // onClick={isRecording ? stopSpeechToText : startSpeechToText}
-//                 onClick={StartStopRecording}
-//                 disabled={loading}
-//             >
-//                 {
-//                     isRecording ? <h2 className='text-red-600 flex gap-2'><Mic /> Stop Recording</h2> :
-//                         'Record Answer'
-//                 }
-
-//             </Button>
-
-//         </div>
-//     )
-// }
-
-// export default RecordAnswerSection
-
 "use client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -190,10 +51,6 @@ const RecordAnswerSection = ({ mockInterviewQuestion, activeQuestionIndex, inter
         setIsAnswerSaved(false); // ✅ Re-enable save button
     }, [activeQuestionIndex]);
 
-    console.log(userAnswer, "User Answer");
-
-    console.log(mockInterviewQuestion, "mockintervie@@@@@@@");
-
 
     // 🎯 Start/Stop Recording
     const StartStopRecording = async () => {
@@ -204,6 +61,8 @@ const RecordAnswerSection = ({ mockInterviewQuestion, activeQuestionIndex, inter
             setIsAnswerSaved(false); // Reset save status
         }
     };
+
+
 
     // 🎯 Save Answer - Only when button is clicked
     const updateUserAnswer = async () => {
@@ -216,14 +75,12 @@ const RecordAnswerSection = ({ mockInterviewQuestion, activeQuestionIndex, inter
             return;
         }
 
+        const toastId = toast.loading("Saving your answer...");
         setLoading(true);
 
         const feedbackPrompt = `Question: ${mockInterviewQuestion?.[activeQuestionIndex]?.question}, 
         User Answer: ${userAnswer}, 
         Give a JSON response with fields: rating (1-10) and feedback (3-5 lines of improvement).`;
-
-        console.log(feedbackPrompt, "feedback prompt");
-
 
         try {
             const result = await chatSession.sendMessage(feedbackPrompt);
@@ -232,7 +89,6 @@ const RecordAnswerSection = ({ mockInterviewQuestion, activeQuestionIndex, inter
                 .replace("```json", "")
                 .replace("```", "");
 
-            console.log(MockResponse, "Mock Response");
             const JsonFeedbackResp = JSON.parse(MockResponse);
 
             const resp = await db.insert(UserAnswer).values({
@@ -254,78 +110,10 @@ const RecordAnswerSection = ({ mockInterviewQuestion, activeQuestionIndex, inter
             console.error("Error saving answer:", error);
             toast("Failed to save answer, please try again.");
         } finally {
+            toast.dismiss(toastId);
             setLoading(false);
         }
     };
-
-    console.log(interviewData, "datainterview");
-
-
-
-    // const updateUserAnswer = async () => {
-    //     if (!userAnswer.trim()) {
-    //         toast("⚠️ No answer recorded! Please start recording and speak.");
-    //         return;
-    //     }
-    //     if (isAnswerSaved) {
-    //         toast("✔️ Answer already saved! Please proceed to the next question.");
-    //         return;
-    //     }
-
-    //     setLoading(true);
-
-    //     try {
-    //         // ❗ Check if the answer already exists in the DB
-    //         const existingAnswer = await db
-    //             .select()
-    //             .from(UserAnswer)
-    //             .where({
-    //                 mockIdRef: interviewData?.mockId,
-    //                 question: mockInterviewQuestion?.[activeQuestionIndex],
-    //                 userEmail: user?.primaryEmailAddress?.emailAddress,
-    //             });
-
-    //         if (existingAnswer.length > 0) {
-    //             toast("⚠️ Answer already recorded! Please take the next question.");
-    //             setIsAnswerSaved(true);
-    //             setLoading(false);
-    //             return;
-    //         }
-
-    //         // 🎯 If no duplicate, insert answer
-    //         const feedbackPrompt = `Question: ${mockInterviewQuestion?.[activeQuestionIndex]?.question}, 
-    //         User Answer: ${userAnswer}, 
-    //         Give a JSON response with fields: rating (1-10) and feedback (3-5 lines of improvement).`;
-
-    //         const result = await chatSession.sendMessage(feedbackPrompt);
-    //         const MockResponse = result.response
-    //             .text()
-    //             .replace("```json", "")
-    //             .replace("```", "");
-
-    //         console.log(MockResponse, "Mock Response");
-    //         const JsonFeedbackResp = JSON.parse(MockResponse);
-
-    //         await db.insert(UserAnswer).values({
-    //             mockIdRef: interviewData?.mockId,
-    //             question: mockInterviewQuestion?.[activeQuestionIndex]?.question,
-    //             correctAns: mockInterviewQuestion?.[activeQuestionIndex]?.answer,
-    //             userAns: userAnswer,
-    //             feedback: JsonFeedbackResp?.feedback,
-    //             rating: JsonFeedbackResp?.rating,
-    //             userEmail: user?.primaryEmailAddress?.emailAddress,
-    //             createdAt: moment().format("DD-MM-yyyy"),
-    //         });
-
-    //         toast("✅ Answer saved successfully!");
-    //         setIsAnswerSaved(true);
-    //     } catch (error) {
-    //         console.error("Error saving answer:", error);
-    //         toast("❌ Failed to save answer, please try again.");
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
 
     // 🎯 Reset Answer
@@ -346,7 +134,7 @@ const RecordAnswerSection = ({ mockInterviewQuestion, activeQuestionIndex, inter
                         width: "100%",
                         zIndex: 10,
                     }}
-                   
+
 
                 />
             </div>
@@ -364,20 +152,42 @@ const RecordAnswerSection = ({ mockInterviewQuestion, activeQuestionIndex, inter
                 </Button>
 
                 {/* Save Answer Button */}
-                <Button variant="outline" onClick={updateUserAnswer} disabled={loading || isAnswerSaved || !userAnswer.trim()}>
+                {/* <Button variant="outline" onClick={updateUserAnswer} disabled={loading || isAnswerSaved || !userAnswer.trim()}>
                     <Save className="mr-2" /> Save Answer
+                </Button> */}
+
+                <Button
+                    variant="outline"
+                    onClick={updateUserAnswer}
+                    disabled={loading || isAnswerSaved || !userAnswer.trim()}
+                >
+                    {loading ? (
+                        <div className="flex items-center gap-2">
+                            <svg className="animate-spin h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v8H4z"
+                                ></path>
+                            </svg>
+                            <span>Saving Answer...</span>
+                        </div>
+                    ) : (
+                        <>
+                            <Save className="mr-2" /> Save Answer
+                        </>
+                    )}
                 </Button>
 
-                {/* Reset Answer Button */}
-                {/* <Button variant="outline" onClick={resetAnswer}>
-                    <RotateCcw className="mr-2" /> Reset
-                </Button> */}
 
-                {/* Refresh Page Button */}
-                {/* <Button variant="outline" onClick={() => window.location.reload()}>
-                    <RefreshCw className="mr-2" /> Refresh
-                </Button> */}
-                {/* {interimResult} */}
             </div>
             {interimResult && (
                 <p className="text-sm text-gray-500 mt-2">

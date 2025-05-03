@@ -13,7 +13,9 @@ const features = [
     "Realistic AI-Driven Interviews.",
     "Get real-time analysis of your answers with actionable insights to improve your interview skills.",
     "Access a curated library of interview questions designed specifically for your desired role.",
-    "Practice interviews anytime, anywhere, fitting seamlessly into your busy schedule.."
+    "Practice interviews anytime, anywhere, fitting seamlessly into your busy schedule..",
+    "AI-Powered Interview Helper",
+    "AI-Powered Resume Builder"
 ]
 
 const Feature = () => {

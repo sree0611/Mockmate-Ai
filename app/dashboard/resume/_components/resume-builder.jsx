@@ -36,21 +36,14 @@ export default function ResumeBuilder({ initialContent }) {
 
     const { isSignedIn, user } = useUser();
 
-    console.log(initialContent, "dd");
-
 
     async function saveResume(content) {
-
-        console.log(content, "content");
 
 
         if (user) {
             const userEmail = user?.primaryEmailAddress; // Clerk provides this
-            console.log(userEmail, "useremail");
 
             const emailAddress = userEmail?.emailAddress
-
-            console.log(emailAddress, "email address");
 
 
             try {
@@ -85,15 +78,15 @@ export default function ResumeBuilder({ initialContent }) {
     }
 
 
-
-
-
     const contactSchema = z.object({
         email: z.string().email("Invalid email address"),
-        mobile: z.string().optional(),
+        mobile: z
+            .string()
+            .regex(/^\d{10}$/, "Mobile number must be exactly 10 digits"),
         linkedin: z.string().optional(),
         twitter: z.string().optional(),
     });
+
 
     const entrySchema = z
         .object({
@@ -149,8 +142,6 @@ export default function ResumeBuilder({ initialContent }) {
     const [previewContent, setPreviewContent] = useState(initialContent);
     // const { user } = useUser();
     const [resumeMode, setResumeMode] = useState("preview");
-
-    console.log(previewContent, "previwcontent");
 
 
     const {

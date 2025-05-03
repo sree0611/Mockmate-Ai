@@ -26,8 +26,6 @@ const QuestionsSection = ({ mockInterviewQuestion, activeQuestionIndex }) => {
 
     const handleVolumeClick = () => {
         const text = mockInterviewQuestion && mockInterviewQuestion[activeQuestionIndex]?.question;
-        console.log(text, "text");
-
         if (isSpeaking) {
             stopSpeech();
         } else {
@@ -39,8 +37,6 @@ const QuestionsSection = ({ mockInterviewQuestion, activeQuestionIndex }) => {
         <div className='p-5 mt-8 border rounded-lg'>
             <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-5'>
                 {mockInterviewQuestion && mockInterviewQuestion?.map((question, index) => {
-                    console.log(question, "qusetion");
-
                     return (
                         <h2
                             key={index} // Add a key for list items

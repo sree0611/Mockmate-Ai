@@ -24,9 +24,8 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider publishableKey="pk_test_Z3Jvd24tYm9iY2F0LTc4LmNsZXJrLmFjY291bnRzLmRldiQ">
       <html lang="en">
-        <body
-          className={`${geistSans.variable}  antialiased`}
-        >
+        <link rel="icon" href="/8131880.png" sizes="any" />
+        <body className={`${geistSans.variable}  antialiased`}>
           {/* <Providers>{children}</Providers> */}
           {children}
         </body>

@@ -143,10 +143,6 @@ export async function saveResume(content) {
 }
 
 export async function getResume() {
-  // const { userId, user } = await auth();
-  // if (!userId || !user) throw new Error("Unauthorized");
-  // console.log(user, "user");
-
   const userEmail = user?.primaryEmailAddress;
 
   return await db.query.Resume.findFirst({
@@ -156,7 +152,6 @@ export async function getResume() {
 
 export async function improveWithAI({ current, type }) {
   const { userId, user } = await auth();
-  console.log(user, "user");
 
   if (!userId || !user) throw new Error("Unauthorized");
 
